@@ -1,0 +1,506 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    /*  background-color: #333333; */
+    background-color: #3d3d3d;
+    margin: 0;
+    padding: 0;
+    color: #e1cdcd;
+}
+
+
+
+h1 {
+    color: #e1cdcd;
+
+}
+
+
+
+#eventForm {
+    margin: 50px;
+    margin-bottom: 20px;
+    padding: 0px;
+    /*  animation: shine 1s ease-in forwards; */
+}
+
+@keyframes shine {
+    0% {
+        filter: brightness(1.5);
+    }
+
+    100% {
+        filter: brightness(1);
+    }
+}
+
+
+#commonNames option {
+    font-size: 100px;
+    /* Change the font size to your preferred value */
+}
+
+
+label,
+input {
+    min-width: 20%;
+    padding: 8px 10px;
+    font-size: 25px;
+    background-color: rgb(47, 58, 61);
+    color: #fff;
+    border-style: solid;
+    border-color: rgb(47, 58, 61);
+    cursor: text;
+}
+
+
+.inputInvalid {
+    background-color: rgb(122, 0, 0);
+}
+
+::placeholder {
+    color: #707070;
+    opacity: 1;
+}
+
+::-ms-input-placeholder {
+    color: #fff;
+}
+
+
+.inFormLargeBtn {
+    width: 20%;
+    font-size: 25px;
+    margin-bottom: 5px;
+    /*  background-color: rgb(33, 41, 43); */
+    background-color: rgb(47, 58, 61);
+    color: #fff;
+    border-style: solid;
+    border-color: rgb(47, 58, 61);
+    cursor: pointer;
+}
+
+.updateBtn,
+.formDeleteBtn,
+.addNewBtn {
+    font-size: 30px;
+    visibility: hidden;
+    padding-top: 5px;
+    background-color: rgb(35, 35, 35);
+    border-style: solid;
+    border-color: rgb(35, 35, 35);
+}
+
+.addNewBtn {
+    visibility: visible;
+    background-color: rgb(35, 35, 35);
+    border-color: rrgb(35, 35, 35);
+}
+
+
+
+
+button {
+    background-color: #242424;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+
+}
+
+/* Style the button when it is selected */
+button.selected {
+    background-color: rgb(195, 107, 0);
+
+    /*  box-shadow: 0px 3px 10px 3px rgba(0, 0, 0, 0.372)inset; */
+}
+
+
+
+.largeBtn {
+    background-color: #242424;
+    color: #fff;
+    padding: 10px 200px;
+    border: none;
+    cursor: pointer;
+    /* width:200px; */
+    /*  float: none; */
+    font-size: 28px;
+    /*  position: absolute;
+    /* left: 350px; */
+
+}
+
+
+#countdowns {
+    margin: 20px;
+    font-size: 50px;
+}
+
+.countdown-item {
+    margin: 6px 60px;
+}
+
+.parent {
+    padding: 5px 1px;
+    text-align: center;
+    background: #256f70;
+    outline: none;
+}
+
+
+/* Click btn animation */
+.inEventDeleteBtn:active,
+.updateBtn:active,
+.formDeleteBtn:active,
+.addNewBtn:active,
+.largeBtn:active {
+    /*  box-shadow: 0 0 3px 3px rgba(192, 192, 192, 0.104); */
+    transform: scale(0.98) !important;
+    box-shadow: 0 0 3px 3px rgba(43, 43, 43, 0.6);
+}
+
+
+
+/* Hover btn animation */
+.inEventDeleteBtn:hover,
+.largeBtn:hover,
+.largeBtn:hover,
+.inFormLargeBtn:hover,
+button.selected:hover {
+    transform: scale(1.02);
+}
+
+
+.tooltiptext:hover {
+    border: solid rgb(91, 132, 142);
+    transform: scale(1.04);
+    filter: brightness(1.1);
+}
+
+.parent:hover {
+    filter: brightness(1.015);
+    transform: scale(1.003);
+}
+
+
+
+/* Outside Shade */
+.live-marker,
+.tooltiptext,
+.inEventDeleteBtn,
+input,
+.inFormLargeBtn,
+.largeBtn,
+#tableDiv tbody,
+.parent {
+    box-shadow: 0px 5px 10px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Inside Shade */
+.timeline {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2) inset, 0 6px 20px 0 rgba(0, 0, 0, 0.19) inset;
+}
+
+.fadeOut {
+    opacity: 1;
+    /*    transform: scaleY(1);  */
+    transform-origin: top;
+    animation: fadeOut 0.5s linear forwards, scale 0.4s linear forwards;
+}
+
+
+
+@keyframes scale {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    100% {
+        transform: scale(1, 0);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        height: 312px;
+        opacity: 1;
+    }
+
+    100% {
+        height: 0px;
+        opacity: 0;
+    }
+}
+
+.selectedEvent {
+    border: solid !important;
+    /*   box-shadow: inset 0px 0px 20px 20px rgba(0, 0, 0, 0.904); */
+    border-color: rgb(0, 255, 242) !important;
+    z-index: 1 !important;
+}
+
+.selectedEvent:hover {
+    border-left-width: 4px !important;
+    border-right-width: 4px !important;
+}
+
+
+
+.child1 {
+    font-size: 28px;
+    display: block;
+    /*  border: 1px solid red; */
+    padding: 1rem 1rem;
+    left: 10px;
+
+}
+
+.child2 {
+    font-size: 150px;
+    display: block;
+    /*  border: 1px solid red; */
+    padding: 1px 1px;
+
+}
+
+.child3 {
+    display: inline;
+    /*  border: 1px solid red; */
+    padding: 1px 1px;
+    font-size: 10px;
+
+}
+
+.child4 {
+    display: inline;
+    /*  border: 1px solid red; */
+    padding: 1px 1px;
+    font-size: 25px;
+
+}
+
+.child5 {
+    display: inline;
+    /*  border: 1px solid red; */
+    padding: 1px 1px;
+    font-size: 25px;
+    float: none
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 50%;
+    display: inline;
+}
+
+th,
+td {
+    border: 1px solid #727272;
+    text-align: center;
+    padding: 6px;
+}
+
+th {
+    background-color: #333333;
+}
+
+tr:nth-child(even) {
+    background-color: #4d4d4d;
+
+}
+
+
+
+.fadeInAndGrow {
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards, growHeight 0.5s ease-in forwards;
+}
+
+.fadeIn {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes growHeight {
+    0% {
+        padding: 0;
+        transform: scale(1, 0.5);
+    }
+
+    100% {
+        padding: auto;
+        transform: scale(1, 1);
+    }
+}
+
+
+/* .timeline-container {
+    display: flex;
+    align-items: center;
+}
+ */
+.timeline-container {
+    display: flex;
+    align-items: center;
+    padding: 15px 15px;
+    background-color: #3d3d3d;
+    width: 100%;
+    transition: position 5s ease;
+    z-index: 1000;
+}
+
+.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.5s;
+    /* box-shadow: 0px 5px 10px 5px rgba(0, 0, 0, 0.2); */
+    animation: slowShade 0.5s ease-out forwards;
+}
+
+@keyframes slowShade {
+    0% {
+        box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0px 5px 20px 10px rgba(0, 0, 0, 0.2);
+    }
+}
+
+
+.timeline {
+    flex-grow: 1;
+    padding: 15px;
+    margin: 50px;
+    margin-top: 30px;
+    margin-bottom: 90px;
+    height: 2px;
+    background: #2c2c2c;
+    position: relative;
+    /*  visibility: hidden; */
+}
+
+
+.arrow-left {
+    visibility: hidden;
+    top: -34px;
+    left: 40px;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-right: 20px solid #aa2a2a;
+    border-top: 10px solid #3d3d3d;
+    border-bottom: 10px solid #3d3d3d;
+    position: relative;
+    transform: translateY(-50%) rotate(360deg);
+}
+
+.arrow-right {
+    visibility: hidden;
+    top: -34px;
+    right: 40px;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 20px solid #aa2a2a;
+    border-top: 10px solid #3d3d3d;
+    border-bottom: 10px solid #3d3d3d;
+    position: relative;
+    transform: translateY(-50%);
+}
+
+.marker {
+    width: 3px;
+    height: 20px;
+    background: #00a1be82;
+    border-radius: 0%;
+    top: 80%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    z-index: 1;
+}
+
+.markerIsOut {
+    background: rgba(255, 149, 0, 0.604);
+}
+
+.marker:hover {
+    z-index: 2;
+}
+
+.live-marker {
+    visibility: hidden;
+    width: 2px;
+    height: 31px;
+    background: #ff2f00;
+    border-radius: 0%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+
+.marker .tooltiptext {
+    visibility: visible;
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+    /* Use half of the width (120/2 = 60), to center the tooltip */
+    color: #fff;
+    background-color: rgb(13, 34, 37);
+    text-align: center;
+    border-radius: 10px;
+    border: solid rgb(61, 74, 77);
+    padding: 5px 0;
+    user-select: none;
+    /* Position the tooltip */
+    position: absolute;
+    cursor: pointer;
+    z-index: 0;
+}
+
+.marker:hover .tooltiptext {
+    visibility: visible;
+}
+
+
+
+*.unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    margin-top: 1000px;
+}
+
+
+
+
+
+
+/*  */
