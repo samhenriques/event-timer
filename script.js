@@ -291,7 +291,6 @@ function setFormFromEvent(event) {
         document.getElementById("eventTime").value = time
 
         // Out Btn
-        log(event)
         event.isOut || event.endTime ? outButton.value = "true" : outButton.value = "false"
         event.isOut || event.endTime ? outButton.classList.add("selected") : outButton.classList.remove("selected");
 
