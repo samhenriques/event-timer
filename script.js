@@ -251,8 +251,9 @@ function setFormFromEvent(event) {
     const countdown = document.getElementById(`countdown_${event.id}`);
     const isSelectedEvent = tooltip.classList.contains("selectedEvent");
     const outButton = document.getElementById("outButton");
-    const newButton = document.getElementById('addNew')
-    const updateButton = document.getElementById('updateBtn')
+    const newButton = document.getElementById('addNew');
+    const updateButton = document.getElementById('updateBtn');
+
 
 
 
@@ -319,6 +320,8 @@ function setFormFromEvent(event) {
         shineAnimation('eventForm')
     }
 
+
+    validateDateTme();
 };
 
 
@@ -640,10 +643,10 @@ function shineAnimation(elementId) {
 function validateDateTme() {
 
     const newEventBtn = document.getElementById("addNew")
-    const updateBtnBtn = document.getElementById("updateBtn")
     const selectedDateEl = document.getElementById("eventDate")
     const selectedTimeEL = document.getElementById("eventTime")
     const selectedDate = selectedDateEl.value;
+
     const selectedTime = selectedTimeEL.value;
     const eventTime = new Date(selectedDate + " " + selectedTime).getTime()
 
@@ -652,14 +655,12 @@ function validateDateTme() {
     const nowHour = new Date(currentTime).getHours()
 
     let currentDateFormat = new Date(new Date().toISOString().split("T")[0]).getTime()
-    let selectedDateFormat = new Date(new Date(selectedDate).toISOString().split("T")[0]).getTime()
-
+    let selectedDateFormat= new Date(new Date(selectedDate).toISOString().split("T")[0]).getTime()
+  
     let dateIsValid = selectedDateFormat >= currentDateFormat
 
     let timeIsValid = selectedTime !== "" && eventTime >= currentTime
 
-
-    let newEventBtnColor = window.getComputedStyle(newEventBtn).color;
     // Date
     if (dateIsValid) {
         selectedDateEl.classList.remove('inputInvalid')
@@ -687,8 +688,7 @@ function validateDateTme() {
         newEventBtn.style.color = 'white'
         selectedTimeEL.classList.add('inputInvalid')
     }
-
-}
+};
 
 
 
@@ -718,8 +718,12 @@ function setEventListeners() {
 
     // Form
     eventDate.addEventListener('dblclick', () => {
-        eventDate.value = new Date().toISOString().slice(0, 10)
-        shineAnimation('eventDate')
+        const nowDate = new Date().toISOString().slice(0, 10)
+        const isSameDate = eventDate.value === nowDate
+        if (!isSameDate) {
+            eventDate.value = nowDate
+            shineAnimation('eventDate')
+        }
     });
     eventTime.addEventListener('dblclick', () => {
         eventTime.value = new Date().toISOString().slice(11, 19)
@@ -733,6 +737,12 @@ function setEventListeners() {
     let arrForDateTime = [eventDate, eventTime]
     for (let i = 0; i < arrForDateTime.length; i++) {
         arrForDateTime[i].addEventListener('input', () => {
+            validateDateTme()
+        })
+        arrForDateTime[i].addEventListener('change', () => {
+            validateDateTme()
+        })
+        arrForDateTime[i].addEventListener('dblclick', () => {
             validateDateTme()
         })
     };
@@ -778,36 +788,12 @@ function setEventListeners() {
         }, 500); // Adjust the delay time as needed
     });
     ////////////////////////////////////
-
-}; // end of  function setEventListeners()
-
-
-
-
-// Page Main CLock
-function setMainPageClock() {
-    document.getElementById("pageClock").textContent = formatNowClock()
-}
-
-
-window.onload = function () {
-    setMainPageClock()
-    syncIntervals(setMainPageClock, "pageClock")
-
-    setEventsFromMemory();
-    buildTimeline();
-    setEventListeners()
-
     let timelineContainer = document.querySelector('.timeline-container');
     let originalPosition = timelineContainer.offsetTop;
 
     window.addEventListener('scroll', () => {
-
         var timelineContainerRect = timelineContainer.getBoundingClientRect();
-
         var countdowns = document.getElementById('countdowns');
-
-
         if (timelineContainerRect.top <= 0) {
             timelineContainer.classList.add('fixed');
 
@@ -825,13 +811,47 @@ window.onload = function () {
             countdowns.style.marginTop = "0"
         }
     });
+    ////////////////////////////////////
+
+}; // end of  function setEventListeners()
+
+
+
+
+// Page Main CLock
+function setMainPageClock() {
+    const nowClock = formatNowClock()
+    document.getElementById("pageClock").textContent = nowClock
+    // document.title = nowClock
+}
+
+
+
+window.onload = function () {
+    setMainPageClock()
+    syncIntervals(setMainPageClock, "pageClock")
+
+    setEventsFromMemory();
+    buildTimeline();
+    setEventListeners();
+
     //////////////////////////////////
 
-
-
-    // Set default date
+    // Set default date to today
     eventDate.value = new Date().toISOString().slice(0, 10)
 
+    /*     document.addEventListener("visibilitychange", (event) => {
+            let isTabVisible = document.visibilityState === 'visible'
+            if (isTabVisible) {
+                window.screensaver.start();
+                log("visible")
+            } else {
+                window.screensaver.
+
+                log("not visible")
+            }
+
+        }); */
 
 
     console.log(localStorage.getItem('cue'))
