@@ -54,6 +54,7 @@ input {
 }
 
 
+
 .inputInvalid {
     background-color: rgb(122, 0, 0);
 }
@@ -83,6 +84,7 @@ input {
 .updateBtn,
 .formDeleteBtn,
 .addNewBtn {
+    position: relative;
     font-size: 30px;
     visibility: hidden;
     padding-top: 5px;
@@ -92,6 +94,7 @@ input {
 }
 
 .addNewBtn {
+
     visibility: visible;
     background-color: rgb(35, 35, 35);
     border-color: rrgb(35, 35, 35);
@@ -112,8 +115,6 @@ button {
 /* Style the button when it is selected */
 button.selected {
     background-color: rgb(195, 107, 0);
-
-    /*  box-shadow: 0px 3px 10px 3px rgba(0, 0, 0, 0.372)inset; */
 }
 
 
@@ -132,8 +133,16 @@ button.selected {
 
 }
 
+.returnKey {
+    position: absolute;
+    top: 0px;
+    right: 3px;
+    margin: 10px;
+    color: grey;
+}
 
 #countdowns {
+    width: 100%;
     margin: 20px;
     font-size: 50px;
 }
@@ -174,14 +183,13 @@ button.selected:hover {
 
 
 .tooltiptext:hover {
-    border: solid rgb(91, 132, 142);
     transform: scale(1.04);
     filter: brightness(1.1);
 }
 
 .parent:hover {
-    filter: brightness(1.015);
-    transform: scale(1.003);
+    filter: brightness(1.010);
+    box-shadow: 0px 0px 15px 10px #00000055;
 }
 
 
@@ -204,9 +212,8 @@ input,
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2) inset, 0 6px 20px 0 rgba(0, 0, 0, 0.19) inset;
 }
 
-.fadeOut {
+.transitionToHistory {
     opacity: 1;
-    /*    transform: scaleY(1);  */
     transform-origin: top;
     animation: fadeOut 0.5s linear forwards, scale 0.4s linear forwards;
 }
@@ -216,24 +223,27 @@ input,
 @keyframes scale {
     0% {
         transform: scale(1, 1);
+        height: 312px;
     }
 
     100% {
         transform: scale(1, 0);
+        height: 0px;
     }
 }
 
 @keyframes fadeOut {
     0% {
-        height: 312px;
         opacity: 1;
     }
 
     100% {
-        height: 0px;
         opacity: 0;
     }
 }
+
+
+
 
 .selectedEvent {
     border: solid !important;
@@ -241,12 +251,6 @@ input,
     border-color: rgb(0, 255, 242) !important;
     z-index: 1 !important;
 }
-
-.selectedEvent:hover {
-    border-left-width: 4px !important;
-    border-right-width: 4px !important;
-}
-
 
 
 .child1 {
@@ -259,7 +263,8 @@ input,
 }
 
 .child2 {
-    font-size: 250px;
+    /* font-size: 190px; */
+    font-size: 11vw;
     display: block;
     /*  border: 1px solid red; */
     padding: 1px 1px;
@@ -325,6 +330,11 @@ tr:nth-child(even) {
     animation: fadeIn 0.5s ease-in forwards
 }
 
+
+.fadeOut {
+    animation: fadeOut 0.5s ease-in forwards;
+}
+
 @keyframes fadeIn {
     0% {
         opacity: 0;
@@ -348,15 +358,10 @@ tr:nth-child(even) {
 }
 
 
-/* .timeline-container {
-    display: flex;
-    align-items: center;
-}
- */
 .timeline-container {
     display: flex;
     align-items: center;
-    padding: 15px 15px;
+    padding-top: 15px;
     background-color: #3d3d3d;
     width: 100%;
     transition: position 5s ease;
@@ -366,19 +371,22 @@ tr:nth-child(even) {
 .fixed {
     position: fixed;
     top: 0;
-    left: 0;
     transition: all 0.5s;
-    /* box-shadow: 0px 5px 10px 5px rgba(0, 0, 0, 0.2); */
     animation: slowShade 0.5s ease-out forwards;
+    background-color: rgba(0, 0, 0, 0.229);
+   
+
 }
 
 @keyframes slowShade {
     0% {
         box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+        /* background-image: linear-gradient(rgba(0, 0, 0, 0.229), rgba(0, 0, 0, 0.229)); */
     }
 
     100% {
         box-shadow: 0px 5px 20px 10px rgba(0, 0, 0, 0.2);
+       /*  background-image: linear-gradient(black, rgba(0, 0, 0, 0.229)); */
     }
 }
 
@@ -398,7 +406,7 @@ tr:nth-child(even) {
 
 .arrow-left {
     visibility: hidden;
-    top: -34px;
+    top: -18px;
     left: 40px;
     display: inline-block;
     width: 0;
@@ -412,7 +420,7 @@ tr:nth-child(even) {
 
 .arrow-right {
     visibility: hidden;
-    top: -34px;
+    top: -18px;
     right: 40px;
     display: inline-block;
     width: 0;
@@ -500,7 +508,112 @@ footer {
 
 
 
+/* ////////////  MOBILE   //////////// */
+@media only screen and (max-width: 990px) {
 
+    label,
+    input {
+        min-width: 80%;
+        font-size: 18px;
+    }
 
+    .inFormLargeBtn,
+    .updateBtn,
+    .formDeleteBtn,
+    .addNewBtn,
+    .largeBtn {
+        width: 80%;
+        font-size: 18px;
+    }
+
+    /* ... (adjust other styles as needed) */
+
+    table {
+        width: 100%;
+    }
+
+    .timeline-container {
+        padding-top: 0px;
+
+    }
+
+    .timeline {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    #countdowns {
+        font-size: 30px;
+        /* Adjust font size for smaller screens */
+    }
+
+    .countdown-item {
+        margin: 6px 10px;
+        /* Adjusted margin for better spacing on smaller screens */
+    }
+
+    .child2 {
+        font-size: 80px;
+    }
+
+}
+
+/* Apply styles for screens smaller than 480px (typical phones) */
+@media only screen and (max-width: 480px) {
+
+    label,
+    input {
+        min-width: 100%;
+        font-size: 16px;
+    }
+
+    .inFormLargeBtn,
+    .updateBtn,
+    .formDeleteBtn,
+    .addNewBtn,
+    .largeBtn {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    /* ... (adjust other styles as needed) */
+
+    table {
+        width: 100%;
+    }
+
+    .timeline-container {
+        padding-top: 0px;
+    }
+
+    .timeline {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    #countdowns {
+        font-size: 20px;
+        /* Adjust font size for smaller screens */
+    }
+
+    .countdown-item {
+        margin: 6px 10px;
+        /* Adjusted margin for better spacing on smaller screens */
+    }
+
+    .child2 {
+        font-size: 110px;
+        /* font-size: 10vw; */
+    }
+}
+
+@media only screen and (max-width: 375px) {
+
+   
+    .child2 {
+     /*    font-size: 65px; */
+        font-size: 10vw;
+    }
+}
 
 /*  */

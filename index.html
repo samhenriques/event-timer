@@ -4,18 +4,11 @@
 <head>
     <title>Event Countdown</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
-
+    <script src="script.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-
-
 <body>
-    <style>
-
-    </style>
-
-
     <div class="header">
         <h1>Event Countdown</h1>
         <h1 id="pageClock"></h1>
@@ -44,14 +37,17 @@
         </datalist>
 
         <input type="date" id="eventDate">
-        <input type="time" id="eventTime" step="5">
+        <input type="time" id="eventTime" step="1">
 
-        <input type="hidden" id="outBtn" value="false">
-        <button class="inFormLargeBtn" id="outButton">Out Event</button>
+        <button class="inFormLargeBtn" id="outButton" value="false" onclick="toggleOutBtnState()">Out Event</button>
 
-        <button class="inFormLargeBtn updateBtn" id="updateBtn">Modify</button>
         <button class="inFormLargeBtn formDeleteBtn" id="formDeleteBtn">Delete</button>
-        <button class="inFormLargeBtn addNewBtn" id="addNew" onclick="addEvent()">New</button>
+        <button class="inFormLargeBtn updateBtn" id="updateBtn">Modify
+            <div class="returnKey">↲</div>
+        </button>
+        <button class="inFormLargeBtn addNewBtn" id="addNew" onclick="addEvent()">New
+            <div class="returnKey">↲</div>
+        </button>
     </div>
 
     <div class="timeline-container">
@@ -63,19 +59,10 @@
     <div id="countdowns">
         <!-- Countdowns will appear here -->
     </div>
-    <!-- <script src="script.js"></script> -->
-
 
     <footer>
-        <p>V16 - 11 Nov 2023</p>
+        <p>Online V6.2</p>
     </footer>
-
-
-
-    <script>
-
-    </script>
-    <script src="script.js"></script>
 </body>
 
 </html>
