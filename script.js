@@ -18,7 +18,28 @@ function syncIntervals(calback, idName) {
     }, millisecondsUntilNextSecond);
 }
 
+/**
+ * Gets the current date and time.
+ * @returns {Object} An object containing the current date and time components.
+ * @property {number} millisecond - The milliseconds since the Unix epoch.
+ * @property {string} date - YYYY-MM-DD.
+ * @property {string} time -ƒ HH:MM:SS.
+ */
+function getNow() {
+    let options = {
+        dateStyle: 'short'
+    };
+    let dateString = new Date().toLocaleString(undefined, options);
+    let date = dateString.split("/").reverse().join("-")
+    let time = new Date().toLocaleTimeString()
+    let nowDATE_TIME = new Date(date + " " + time).getTime()
 
+    return {
+        milliseconds: nowDATE_TIME,
+        date,
+        time
+    }
+}
 
 function addEvent() {
     const newEventName = document.getElementById("eventName").value;
@@ -26,10 +47,6 @@ function addEvent() {
     const selectedDate = document.getElementById("eventDate").value
     const selectedTime = document.getElementById("eventTime").value
     const eventTime = new Date(selectedDate + " " + selectedTime).getTime()
-    const currentTime = new Date().getTime();
-
-    //if (eventTime > currentTime) {
-
 
 
     // Store the event in localStorage
@@ -38,7 +55,8 @@ function addEvent() {
         name: eventName,
         time: eventTime,
         isOut: JSON.parse(document.getElementById("outBtn").value),
-        endTime: false,
+        outTime: "",
+        started: false,
     };
 
     let cue = JSON.parse(localStorage.getItem('cue')) || [];
@@ -91,8 +109,8 @@ function renderCountdown(event) {
 
     function updateCountdown() {
 
-        const now = new Date().getTime();
-        const timeRemaining = event.time - now;
+        // const now = new Date().getTime();
+        const timeRemaining = event.time - getNow().milliseconds;
 
 
         // Started Events
@@ -115,16 +133,22 @@ function renderCountdown(event) {
 
             const isOutBtn = event.isOut ? `<button onclick="startEvent(${event.id})" class="largeBtn">Start Event</button>` : ""
 
+            const elapsedTime = new Date((new Date()) - event.time) //.toLocaleTimeString()
 
             const countDownClock = `
             <div class='child1 unselectable'><b>${event.name}</b> at ${eventTimeString} starts in </div>
             <div class='child2 unselectable'><b>${formatCountDownClock(timeRemaining)}</b> </div>
             `
             const nowClock = `
-            <div class='child1 unselectable'><b>${event.name}</b> is past due</div>
+            <div class='child1 unselectable'><b>${event.name}</b> scheduled to ${eventTimeString}</div>
             <div class='child2 unselectable'><b>${formatNowClock()}</b> </div>
             `
-            const clock = timeRemaining <= 0 && event.isOut ? nowClock : countDownClock
+
+            const elapsedTimeClock = `
+            <div class='child1 unselectable'><b>${event.name}</b> scheduled to ${eventTimeString}</div>
+            <div class='child2 unselectable'><b>+ ${formatCountDownClock(elapsedTime)}</b> </div>
+            `
+            const clock = timeRemaining <= 0 && event.isOut ? elapsedTimeClock : countDownClock
 
 
             countdownElement.innerHTML = `
@@ -203,9 +227,6 @@ function formatNowClock() {
     return `${hours}h ${minutes}m ${seconds}s`;
 };
 
-function formatTime(ms) {
-    return new Date(ms).toISOString().split("T")[1].split(".")[0];
-}
 
 
 
@@ -279,12 +300,16 @@ function setFormFromEvent(event) {
         // Name
         document.getElementById("eventName").value = event.name;
 
+
         //Date & Time
-        let date = new Date(event.time).toISOString().slice(0, 10)
-        let time = new Date(event.time).toISOString().slice(11, 19)
+        let date = getNow().date
+        let time = new Date(event.time).toLocaleTimeString()
 
         document.getElementById("eventDate").value = date
         document.getElementById("eventTime").value = time
+
+
+
         var outBtn = document.getElementById("outBtn");
         var outButton = document.getElementById("outButton");
 
@@ -346,12 +371,18 @@ function resetForm() {
 };
 
 
+function formatTime(ms) {
+    return new Date(ms).toLocaleTimeString();
+}
+
+
 function buildTable() {
 
     var table = document.querySelector("table");
 
     let cue = JSON.parse(localStorage.getItem('cue'))
-    let oldEvents = cue.filter(e => e.time - new Date().getTime() <= 0 && !e.isOut)
+
+    let oldEvents = cue.filter(e => e.time - getNow().milliseconds <= 0 && !e.isOut)
     let deleteAllEventsBtn = `<div class='child5 unselectable'><button class="inEventDeleteBtn" onclick="clearAllEvents()">Clear Event History</button></div>`
 
 
@@ -374,19 +405,19 @@ function buildTable() {
 
             let event = oldEvents[i]
 
-            let evStartTime = event.endTime ? "" : formatTime(event.time)
-            let evEndTime = event.endTime ? formatTime(event.time) : ""
+            let tcIn = event.outTime ? "" : formatTime(event.time)
+            let tcOut = event.outTime ? formatTime(event.time): ""
             let deleteBtn = `<div class='child5 unselectable'><button class="inEventDeleteBtn" onclick="deleteEvent(${event.id})">Delete</button></div>`
 
             var newRow = table.insertRow(-1); // Insert at the end of the table
 
             var startDate = newRow.insertCell(0);
-            var endTime = newRow.insertCell(1);
+            var endDate = newRow.insertCell(1);
             var description = newRow.insertCell(2);
             var deleteRow = newRow.insertCell(3);
 
-            startDate.innerHTML = evStartTime;
-            endTime.innerHTML = evEndTime
+            startDate.innerHTML = tcIn;
+            endDate.innerHTML = tcOut
             description.innerHTML = event.name
             deleteRow.innerHTML = deleteBtn
 
@@ -415,9 +446,11 @@ function startEvent(eventId) {
     let cue = JSON.parse(localStorage.getItem('cue'))
 
     let eventToOut = cue.find(e => e.id === eventId)
-    eventToOut.time = Date.now();
+    eventToOut.time = getNow().milliseconds
     eventToOut.isOut = !eventToOut.isOut
-    eventToOut.endTime = true
+    eventToOut.started = true
+    eventToOut.outTime = getNow().milliseconds
+    
 
     let clearEventToOut = cue.filter(e => e.id !== eventId)
 
@@ -481,7 +514,7 @@ function buildTimeline() {
         marker.style.left = calculateMarkerPosition(event.time).position + 'px';
         marker.title = event.name;
 
-        if (event.isOut || event.endTime) {
+        if (event.isOut || event.started) {
             marker.classList.add('markerIsOut')
         }
 
@@ -621,7 +654,7 @@ function shineAnimation(elementId) {
 
 
 
-function validateDateTme() {
+function validateDate_Time() {
 
     const selectedDateEl = document.getElementById("eventDate")
     const selectedTimeEL = document.getElementById("eventTime")
@@ -631,8 +664,8 @@ function validateDateTme() {
 
     const selectedHour = Number(selectedTime.split(":")[0])
 
-
     const currentTime = new Date().getTime();
+
     let currentDateFormat = new Date(new Date().toISOString().split("T")[0]).getTime()
     let selectedDateFormat = new Date(new Date(selectedDate).toISOString().split("T")[0]).getTime()
 
@@ -707,7 +740,7 @@ function setEventListeners() {
         shineAnimation('eventDate')
     });
     eventTime.addEventListener('dblclick', () => {
-        eventTime.value = new Date().toISOString().slice(11, 19)
+        eventTime.value = new Date().toLocaleTimeString()
         shineAnimation('eventTime')
     });
     outBtn.addEventListener('click', () => {
@@ -718,7 +751,7 @@ function setEventListeners() {
     let arrForDateTime = [eventDate, eventTime]
     for (let i = 0; i < arrForDateTime.length; i++) {
         arrForDateTime[i].addEventListener('input', () => {
-            validateDateTme()
+            validateDate_Time()
         })
     };
     ////////////////////////////////
