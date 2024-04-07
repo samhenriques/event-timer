@@ -21,15 +21,12 @@ function syncIntervals(calback, idName) {
 /**
  * Gets the current date and time.
  * @returns {Object} An object containing the current date and time components.
- * @property {number} millisecond - The milliseconds since the Unix epoch.
+ * @property {number} milliseconds - milliseconds since the Unix epoch.
  * @property {string} date - YYYY-MM-DD.
- * @property {string} time -ƒ HH:MM:SS.
+ * @property {string} time - HH:MM:SS.
  */
 function getNow() {
-    let options = {
-        dateStyle: 'short'
-    };
-    let dateString = new Date().toLocaleString(undefined, options);
+    let dateString = new Date().toISOString().split('T').slice(0, 1).join()
     let date = dateString.split("/").reverse().join("-")
     let time = new Date().toLocaleTimeString()
     let nowDATE_TIME = new Date(date + " " + time).getTime()
@@ -133,8 +130,9 @@ function renderCountdown(event) {
 
             const isOutBtn = event.isOut ? `<button onclick="startEvent(${event.id})" class="largeBtn">Start Event</button>` : ""
 
-            const elapsedTime = new Date((new Date()) - event.time) //.toLocaleTimeString()
-
+            //const elapsedTime = new Date((new Date()) - event.time) //.toLocaleTimeString()
+            const elapsedTime = getNow().milliseconds - event.time //.toLocaleTimeString()
+            
             const countDownClock = `
             <div class='child1 unselectable'><b>${event.name}</b> at ${eventTimeString} starts in </div>
             <div class='child2 unselectable'><b>${formatCountDownClock(timeRemaining)}</b> </div>
@@ -406,7 +404,7 @@ function buildTable() {
             let event = oldEvents[i]
 
             let tcIn = event.outTime ? "" : formatTime(event.time)
-            let tcOut = event.outTime ? formatTime(event.time): ""
+            let tcOut = event.outTime ? formatTime(event.time) : ""
             let deleteBtn = `<div class='child5 unselectable'><button class="inEventDeleteBtn" onclick="deleteEvent(${event.id})">Delete</button></div>`
 
             var newRow = table.insertRow(-1); // Insert at the end of the table
@@ -450,7 +448,7 @@ function startEvent(eventId) {
     eventToOut.isOut = !eventToOut.isOut
     eventToOut.started = true
     eventToOut.outTime = getNow().milliseconds
-    
+
 
     let clearEventToOut = cue.filter(e => e.id !== eventId)
 
@@ -623,8 +621,7 @@ function sortCountdownsDiv() {
     var listitems = [];
     for (i = 0; i < divs.length; i++) {
 
-        let divClass = divs[i].getAttribute('class')
-        let inneHtml = divs[1].innerHTML
+        let divClass = divs[i].getAttribute('class');
         if (divClass.startsWith("countdown-item")) {
             let time = divClass.split(" ")[1]
             listitems.push({
