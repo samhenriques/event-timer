@@ -18,45 +18,31 @@ function syncIntervals(calback, idName) {
     }, millisecondsUntilNextSecond);
 }
 
-/**
- * Gets the current date and time.
- * @returns {Object} An object containing the current date and time components.
- * @property {number} millisecond - The milliseconds since the Unix epoch.
- * @property {string} date - YYYY-MM-DD.
- * @property {string} time -ƒ HH:MM:SS.
- */
-function getNow() {
-    let options = {
-        dateStyle: 'short'
-    };
-    let dateString = new Date().toLocaleString(undefined, options);
-    let date = dateString.split("/").reverse().join("-")
-    let time = new Date().toLocaleTimeString()
-    let nowDATE_TIME = new Date(date + " " + time).getTime()
 
-    return {
-        milliseconds: nowDATE_TIME,
-        date,
-        time
-    }
-}
 
 function addEvent() {
+    const newEventBtn = document.getElementById("addNew")
     const newEventName = document.getElementById("eventName").value;
     const eventName = newEventName ? newEventName : "New Event"
     const selectedDate = document.getElementById("eventDate").value
     const selectedTime = document.getElementById("eventTime").value
     const eventTime = new Date(selectedDate + " " + selectedTime).getTime()
+    const currentTime = new Date().getTime();
 
+    //if (eventTime > currentTime) {
+
+    if (selectedTime === "") {
+        validateDateTme();
+        return;
+    } else {}
 
     // Store the event in localStorage
     const event = {
         id: Date.now(),
         name: eventName,
         time: eventTime,
-        isOut: JSON.parse(document.getElementById("outBtn").value),
-        outTime: "",
-        started: false,
+        isOut: JSON.parse(document.getElementById("outButton").value),
+        endTime: false,
     };
 
     let cue = JSON.parse(localStorage.getItem('cue')) || [];
@@ -82,8 +68,7 @@ function addEvent() {
     document.querySelectorAll('.countdown-item').forEach(e =>
         e.classList.remove('selectedEvent'));
 
-    //const form = document.getElementById(`eventForm`)
-    //form.classList.remove('selectedEvent')
+
 }
 
 
@@ -109,14 +94,14 @@ function renderCountdown(event) {
 
     function updateCountdown() {
 
-        // const now = new Date().getTime();
-        const timeRemaining = event.time - getNow().milliseconds;
+        const now = new Date().getTime();
+        const timeRemaining = event.time - now;
 
 
         // Started Events
         if (timeRemaining < 0 && !event.isOut) {
 
-            countdownElement.classList.add("fadeOut");
+            countdownElement.classList.add("transitionToHistory");
 
             //remove event from countdowns
             setTimeout(function () {
@@ -133,22 +118,16 @@ function renderCountdown(event) {
 
             const isOutBtn = event.isOut ? `<button onclick="startEvent(${event.id})" class="largeBtn">Start Event</button>` : ""
 
-            const elapsedTime = new Date((new Date()) - event.time) //.toLocaleTimeString()
 
             const countDownClock = `
             <div class='child1 unselectable'><b>${event.name}</b> at ${eventTimeString} starts in </div>
             <div class='child2 unselectable'><b>${formatCountDownClock(timeRemaining)}</b> </div>
             `
             const nowClock = `
-            <div class='child1 unselectable'><b>${event.name}</b> scheduled to ${eventTimeString}</div>
+            <div class='child1 unselectable'><b>${event.name}</b> is past due</div>
             <div class='child2 unselectable'><b>${formatNowClock()}</b> </div>
             `
-
-            const elapsedTimeClock = `
-            <div class='child1 unselectable'><b>${event.name}</b> scheduled to ${eventTimeString}</div>
-            <div class='child2 unselectable'><b>+ ${formatCountDownClock(elapsedTime)}</b> </div>
-            `
-            const clock = timeRemaining <= 0 && event.isOut ? elapsedTimeClock : countDownClock
+            const clock = timeRemaining <= 0 && event.isOut ? nowClock : countDownClock
 
 
             countdownElement.innerHTML = `
@@ -229,7 +208,6 @@ function formatNowClock() {
 
 
 
-
 function deleteEvent(eventId, message = 'delete', callBack) {
     setTimeout(() => { // Allow 25ms for the btn animations 
         if (confirm(`Are you sure you want to ${message} this event?`)) {
@@ -266,23 +244,27 @@ function clearAllEvents() {
 function setFormFromEvent(event) {
 
     const tooltip = document.getElementById(`tooltip_${event.id}`);
-    const countdown = document.getElementById(`countdown_${event.id}`)
-    // const contdownParent = countdown.querySelector(".parent");
-    const form = document.getElementById(`eventForm`);
+    const countdown = document.getElementById(`countdown_${event.id}`);
     const isSelectedEvent = tooltip.classList.contains("selectedEvent");
-    var outBtn = document.getElementById("outBtn");
-    var outButton = document.getElementById("outButton");
+    const outButton = document.getElementById("outButton");
+    const newButton = document.getElementById('addNew');
+    const updateButton = document.getElementById('updateBtn');
+
+
+
 
     if (isSelectedEvent) {
 
         resetForm()
-        tooltip.classList.remove('selectedEvent')
-        countdown.classList.remove('selectedEvent')
-        outBtn.value = "false"
-
-
+        tooltip && tooltip.classList.remove('selectedEvent');
+        countdown && countdown.classList.remove('selectedEvent');
+        outButton.value = "false"
 
     } else {
+
+        updateButton.firstElementChild.style.visibility = "visible"
+        newButton.firstElementChild.style.visibility = "hidden"
+
         // Clear all selected to add to new selection
         document.querySelectorAll('.countdown-item').forEach(e =>
             e.classList.remove('selectedEvent'));
@@ -292,30 +274,23 @@ function setFormFromEvent(event) {
         timelineToolTips.forEach(ch => {
             ch.classList.remove('selectedEvent')
         });
-        // form.classList.remove('selectedEvent')
-
 
 
         // Setting Form
         // Name
         document.getElementById("eventName").value = event.name;
 
-
         //Date & Time
-        let date = getNow().date
+        let date = new Date(event.time).toISOString().slice(0, 10)
+        // let time = new Date(event.time).toISOString().slice(11, 19)
         let time = new Date(event.time).toLocaleTimeString()
 
         document.getElementById("eventDate").value = date
         document.getElementById("eventTime").value = time
 
-
-
-        var outBtn = document.getElementById("outBtn");
-        var outButton = document.getElementById("outButton");
-
         // Out Btn
-        outBtn.value = event.isOut.toString()
-        event.isOut ? outButton.classList.add("selected") : outButton.classList.remove("selected");
+        event.isOut || event.endTime ? outButton.value = "true" : outButton.value = "false"
+        event.isOut || event.endTime ? outButton.classList.add("selected") : outButton.classList.remove("selected");
 
         ///////////////
 
@@ -339,12 +314,11 @@ function setFormFromEvent(event) {
         // Make elements selected
         tooltip.classList.add('selectedEvent')
         countdown && countdown.classList.add('selectedEvent')
-        //contdownParent.classList.add('selectedEvent')
-        // form.classList.add('selectedEvent')
-
         shineAnimation('eventForm')
     }
 
+
+    validateDateTme();
 };
 
 
@@ -357,23 +331,29 @@ function resetForm() {
     document.getElementById("eventName").value = "";
     document.getElementById("eventDate").value = new Date().toISOString().slice(0, 10)
     document.getElementById("eventTime").value = ""
-    document.getElementById("outButton").classList.remove("selected");
-    document.getElementById(`updateBtn`).style = 'visibility: hidden'
-    document.getElementById(`formDeleteBtn`).style = 'visibility: hidden';
+    const outButton = document.getElementById("outButton")
+    outButton.classList.remove("selected");
+    outButton.value = "false"
 
     const selectedDateEl = document.getElementById("eventDate")
     const selectedTimeEL = document.getElementById("eventTime")
     selectedDateEl.classList.remove('inputInvalid')
     selectedTimeEL.classList.remove('inputInvalid')
 
+    ///  Update and Delete Btn
 
+    const updateBtn = document.getElementById("updateBtn")
+    const formDeleteBtn = document.getElementById(`formDeleteBtn`);
+    const newButton = document.getElementById('addNew')
+    updateBtn.style = 'visibility: hidden'
+    formDeleteBtn.style = 'visibility: hidden';
+
+
+
+    updateBtn.firstElementChild.style.visibility = ""
+    newButton.firstElementChild.style.visibility = "visible"
     shineAnimation('eventForm')
 };
-
-
-function formatTime(ms) {
-    return new Date(ms).toLocaleTimeString();
-}
 
 
 function buildTable() {
@@ -381,8 +361,7 @@ function buildTable() {
     var table = document.querySelector("table");
 
     let cue = JSON.parse(localStorage.getItem('cue'))
-
-    let oldEvents = cue.filter(e => e.time - getNow().milliseconds <= 0 && !e.isOut)
+    let oldEvents = cue.filter(e => e.time - new Date().getTime() <= 0 && !e.isOut)
     let deleteAllEventsBtn = `<div class='child5 unselectable'><button class="inEventDeleteBtn" onclick="clearAllEvents()">Clear Event History</button></div>`
 
 
@@ -405,19 +384,19 @@ function buildTable() {
 
             let event = oldEvents[i]
 
-            let tcIn = event.outTime ? "" : formatTime(event.time)
-            let tcOut = event.outTime ? formatTime(event.time): ""
+            let evStartTime = event.endTime ? "" : new Date(event.time).toLocaleTimeString()
+            let evEndTime = event.endTime ? new Date(event.time).toLocaleTimeString() : ""
             let deleteBtn = `<div class='child5 unselectable'><button class="inEventDeleteBtn" onclick="deleteEvent(${event.id})">Delete</button></div>`
 
             var newRow = table.insertRow(-1); // Insert at the end of the table
 
             var startDate = newRow.insertCell(0);
-            var endDate = newRow.insertCell(1);
+            var endTime = newRow.insertCell(1);
             var description = newRow.insertCell(2);
             var deleteRow = newRow.insertCell(3);
 
-            startDate.innerHTML = tcIn;
-            endDate.innerHTML = tcOut
+            startDate.innerHTML = evStartTime;
+            endTime.innerHTML = evEndTime
             description.innerHTML = event.name
             deleteRow.innerHTML = deleteBtn
 
@@ -446,11 +425,9 @@ function startEvent(eventId) {
     let cue = JSON.parse(localStorage.getItem('cue'))
 
     let eventToOut = cue.find(e => e.id === eventId)
-    eventToOut.time = getNow().milliseconds
+    eventToOut.time = Date.now();
     eventToOut.isOut = !eventToOut.isOut
-    eventToOut.started = true
-    eventToOut.outTime = getNow().milliseconds
-    
+    eventToOut.endTime = true
 
     let clearEventToOut = cue.filter(e => e.id !== eventId)
 
@@ -463,7 +440,7 @@ function startEvent(eventId) {
     // location.reload();
 
     const thisEventElement = document.getElementById(`countdown_${eventId}`)
-    thisEventElement.classList.add("fadeOut")
+    thisEventElement.classList.add("transitionToHistory")
 
     setTimeout(function () {
         var element = document.getElementById(`countdown_${eventId}`);
@@ -483,6 +460,8 @@ function buildTimeline() {
 
     const timelineData = JSON.parse(localStorage.getItem('cue'));
     const timeline = document.getElementById('timeline');
+
+
 
     if (!timelineData || timelineData.length === 0) {
         timeline.style.visibility = 'hidden'
@@ -509,12 +488,13 @@ function buildTimeline() {
 
         let event = timelineData[i]
 
+
         const marker = document.createElement('div');
         marker.classList.add('marker');
         marker.style.left = calculateMarkerPosition(event.time).position + 'px';
         marker.title = event.name;
 
-        if (event.isOut || event.started) {
+        if (event.isOut || event.endTime) {
             marker.classList.add('markerIsOut')
         }
 
@@ -523,6 +503,7 @@ function buildTimeline() {
         tooltip.classList.add('tooltiptext');
         tooltip.innerHTML = `${event.name}<br>${new Date(event.time).toLocaleString().split(" ").slice(-1).join()}`;
         tooltip.id = `tooltip_${event.id}`
+
         marker.appendChild(tooltip);
         timeline.appendChild(marker);
 
@@ -643,7 +624,10 @@ function sortCountdownsDiv() {
     }
 }
 
-//eventForm
+
+/** 
+ * @param {string} elementId - html element id
+ */
 function shineAnimation(elementId) {
     const element = document.getElementById(elementId)
     if (element) {
@@ -653,27 +637,26 @@ function shineAnimation(elementId) {
 };
 
 
+function validateDateTme() {
 
-function validateDate_Time() {
-
+    const newEventBtn = document.getElementById("addNew")
     const selectedDateEl = document.getElementById("eventDate")
     const selectedTimeEL = document.getElementById("eventTime")
     const selectedDate = selectedDateEl.value;
+
     const selectedTime = selectedTimeEL.value;
     const eventTime = new Date(selectedDate + " " + selectedTime).getTime()
 
-    const selectedHour = Number(selectedTime.split(":")[0])
-
     const currentTime = new Date().getTime();
+    const selectedHour = Number(selectedTime.split(":")[0])
+    const nowHour = new Date(currentTime).getHours()
 
     let currentDateFormat = new Date(new Date().toISOString().split("T")[0]).getTime()
     let selectedDateFormat = new Date(new Date(selectedDate).toISOString().split("T")[0]).getTime()
 
     let dateIsValid = selectedDateFormat >= currentDateFormat
 
-
-
-    let timeIsValid = eventTime >= currentTime
+    let timeIsValid = selectedTime !== "" && eventTime >= currentTime
 
     // Date
     if (dateIsValid) {
@@ -685,44 +668,39 @@ function validateDate_Time() {
     //Time
     if (timeIsValid) {
         selectedTimeEL.classList.remove('inputInvalid')
+        newEventBtn.style.color = 'white'
+    } else if (selectedTime == "") {
+        newEventBtn.style.color = "grey"
+        selectedTimeEL.classList.add('inputInvalid')
+
+    } else if (selectedHour <= 5 && nowHour >= 5) {
+
+        newEventBtn.style.color = 'white'
+        const oneDayMilliseconds = 24 * 60 * 60 * 1000;
+        selectedDateEl.value = new Date(new Date().getTime() + oneDayMilliseconds).toISOString().slice(0, 10)
+
+        shineAnimation(selectedDateEl.id)
+
     } else {
-
-        if (selectedHour <= 5) {
-
-            const oneDayMilliseconds = 24 * 60 * 60 * 1000;
-            selectedDateEl.value = new Date(new Date().getTime() + oneDayMilliseconds).toISOString().slice(0, 10)
-
-
-            const tooltip = document.createElement('span');
-            tooltip.classList.add('tooltipDate');
-            tooltip.innerHTML = `Tomorow Date`;
-
-
-            selectedDateEl.appendChild(tooltip);
-            shineAnimation(selectedDateEl.id)
-
-        } else {
-            selectedTimeEL.classList.add('inputInvalid')
-
-        }
-
+        newEventBtn.style.color = 'white'
+        selectedTimeEL.classList.add('inputInvalid')
     }
-}
+};
+
 
 
 function toggleOutBtnState() {
-    var outBtn = document.getElementById("outBtn");
-    var outButton = document.getElementById("outButton");
+    const outButton = document.getElementById("outButton");
 
-    if (outBtn.value === "false") {
-        outBtn.value = "true"
+
+    if (outButton.value === "false") {
+        outButton.value = "true"
         outButton.classList.add("selected");
     } else {
-        outBtn.value = "false"
+        outButton.value = "false"
         outButton.classList.remove("selected");
     }
-
-    console.log("is type Out: " + outBtn.value)
+    console.log("is type Out: " + outButton.value)
 }
 
 function setEventListeners() {
@@ -730,28 +708,36 @@ function setEventListeners() {
     let eventDate = document.getElementById("eventDate");
     let eventTime = document.getElementById("eventTime");
     let eventName = document.getElementById("eventName");
-    let outBtn = document.getElementById("outButton");
+    let outButton = document.getElementById("outButton");
+    let updateBtn = document.getElementById("updateBtn");
     let addNew = document.getElementById("addNew");
 
 
     // Form
     eventDate.addEventListener('dblclick', () => {
-        eventDate.value = new Date().toISOString().slice(0, 10)
-        shineAnimation('eventDate')
+        const nowDate = new Date().toISOString().slice(0, 10)
+        const isSameDate = eventDate.value === nowDate
+        if (!isSameDate) {
+            eventDate.value = nowDate
+            shineAnimation('eventDate')
+        }
     });
     eventTime.addEventListener('dblclick', () => {
         eventTime.value = new Date().toLocaleTimeString()
         shineAnimation('eventTime')
     });
-    outBtn.addEventListener('click', () => {
-        toggleOutBtnState()
-    })
 
 
     let arrForDateTime = [eventDate, eventTime]
     for (let i = 0; i < arrForDateTime.length; i++) {
         arrForDateTime[i].addEventListener('input', () => {
-            validateDate_Time()
+            validateDateTme()
+        })
+        arrForDateTime[i].addEventListener('change', () => {
+            validateDateTme()
+        })
+        arrForDateTime[i].addEventListener('dblclick', () => {
+            validateDateTme()
         })
     };
     ////////////////////////////////
@@ -759,17 +745,28 @@ function setEventListeners() {
     // Press return to create new event
 
     //
-    let arrForKeypress = [eventDate, eventTime, eventName, outBtn, addNew]
+    let arrForKeypress = [eventDate, eventTime, eventName, outButton, addNew]
+
 
     for (let i = 0; i < arrForKeypress.length; i++) {
-        // Execute a function when the user presses a key on the keyboard
+
         arrForKeypress[i].addEventListener("keypress", function (event) {
-            // If the user presses the "Enter" key on the keyboard
+
             if (event.key === "Enter") {
                 // Cancel the default action, if needed
                 event.preventDefault();
-                // Trigger the button element with a click
-                addNew.click();
+
+                let isSelected = document.querySelectorAll('.selectedEvent').length > 0
+
+                if (isSelected) {
+
+                    updateBtn.click();
+
+                } else {
+                    addNew.click();
+                }
+
+
             };
         });
     };
@@ -785,39 +782,14 @@ function setEventListeners() {
         }, 500); // Adjust the delay time as needed
     });
     ////////////////////////////////////
-
-}; // end of  function setEventListeners()
-
-
-
-
-// Page Main CLock
-function setMainPageClock() {
-    document.getElementById("pageClock").textContent = formatNowClock()
-}
-
-
-window.onload = function () {
-    setMainPageClock()
-    syncIntervals(setMainPageClock, "pageClock")
-
-    setEventsFromMemory();
-    buildTimeline();
-    setEventListeners()
-
     let timelineContainer = document.querySelector('.timeline-container');
     let originalPosition = timelineContainer.offsetTop;
 
     window.addEventListener('scroll', () => {
-
         var timelineContainerRect = timelineContainer.getBoundingClientRect();
-
         var countdowns = document.getElementById('countdowns');
-
-
         if (timelineContainerRect.top <= 0) {
             timelineContainer.classList.add('fixed');
-
             countdowns.style.marginTop = timelineContainer.offsetHeight + 25 + "px"
             // margin:220
 
@@ -832,13 +804,47 @@ window.onload = function () {
             countdowns.style.marginTop = "0"
         }
     });
+    ////////////////////////////////////
+
+}; // end of  function setEventListeners()
+
+
+
+
+// Page Main CLock
+function setMainPageClock() {
+    const nowClock = formatNowClock()
+    document.getElementById("pageClock").textContent = nowClock
+    // document.title = nowClock
+}
+
+
+
+window.onload = function () {
+    setMainPageClock()
+    syncIntervals(setMainPageClock, "pageClock")
+
+    setEventsFromMemory();
+    buildTimeline();
+    setEventListeners();
+
     //////////////////////////////////
 
-
-
-    // Set default date
+    // Set default date to today
     eventDate.value = new Date().toISOString().slice(0, 10)
 
+    /*     document.addEventListener("visibilitychange", (event) => {
+            let isTabVisible = document.visibilityState === 'visible'
+            if (isTabVisible) {
+                window.screensaver.start();
+                log("visible")
+            } else {
+                window.screensaver.
+
+                log("not visible")
+            }
+
+        }); */
 
 
     console.log(localStorage.getItem('cue'))
